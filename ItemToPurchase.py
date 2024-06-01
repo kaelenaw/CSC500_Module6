@@ -4,8 +4,8 @@ class ItemToPurchase:
         self.item_price = item_price
         self.item_quantity = item_quantity
         self.item_description = item_description
-    def print_item_cost(self):
         self.item_total = float(f'{(self.item_price * self.item_quantity):2f}')
+    def print_item_cost(self):
         print(f"{self.item_name} {self.item_quantity} @ ${self.item_price:.2f} = ${self.item_total:.2f}")
 
 class ShoppingCart:
@@ -15,19 +15,19 @@ class ShoppingCart:
         self.cart_items = []
 
     def add_item(self, item):
-        # Get input for item information from user
-        name = item
-        price = float(input('Item price: \n'))
-        quantity = int(input('Item quantity: \n'))
-        description = input('Item description: \n')
-
-        ItemToPurchase(name, price, quantity, description) # Creates ItemToPurchase with input info
         self.cart_items.append(item) # Adds item name to cart items
 
-    def remove_item(self,item):
-        if item in self.cart_items:
-            self.cart_items.remove(item)
-        else:
+    def remove_item(self, item_name):
+        removed = False
+        print("Trying to remove:", item_name)  # Debugging statement
+        for item in self.cart_items[:]:  # Iterate over a copy of the list
+            print("Item in cart:", item.item_name)  # Debugging statement
+            if item.item_name == item_name:
+                self.cart_items.remove(item)
+                print(f'{item_name} removed from cart.')
+                removed = True
+                break
+        if not removed:
             print('\nItem not found in cart. Nothing removed.\n')
 
     def modify_item(self, ItemToPurchase):
@@ -51,35 +51,41 @@ class ShoppingCart:
         return total_cost
 
     def print_total(self):
-        print('{self.customer_name}\'s Shopping Cart - {self.current_date}\n')
+        print(f"{self.customer_name}'s Shopping Cart - {self.current_date}")
         if len(self.cart_items) == 0:
             print('SHOPPING CART IS EMPTY')
         else:
-            print('Number of Items:', self.get_num_items_in_cart)
+            print('Number of Items:', self.get_num_items_in_cart())
             for item in self.cart_items:
-                print('{n} {q} @ ${p:.2f} = {t:.2f}\n'.format(n = item.item_name, p = item.item_price, q = item.item_quantity, t = item.item_total))
-            print(self.get_cost_of_cart)
+                print('{n} {q} @ ${p:.2f} = ${t:.2f}'.format(n = item.item_name, p = item.item_price, q = item.item_quantity, t = item.item_total))
+            print(f'Total: ${self.get_cost_of_cart():.2f}')
 
     def print_descriptions(self):
-        print('{self.customer_name}\'s Shopping Cart - {self.current_date}\n')
+        print(f'{self.customer_name}\'s Shopping Cart - {self.current_date}')
         print('Item Descriptions')
         for item in self.cart_items:
-            print('{n}: {d}\n'.format(n = item.item_name, d = item.item_description))
+            print('{n}: {d}'.format(n = item.item_name, d = item.item_description))
 
 def print_menu(ShoppingCart):
     selection = ''
 
     while selection != 'q':
-        print('MENU\n')
+        print('\nMENU\n')
         print('a - Add item to cart')
         print('r - Remove item from cart')
         print('c - Change item quantity')
         print('i - Output items\' descriptions')
         print('o - Output shopping cart')
         print('q - Quit')
-        selection = input('Choose an option: ')
+        selection = input('\nChoose an option: \n')
         if selection == 'a':
-            item = input('Item name: \n')
+            # Get input for item information from user
+            name = input('Item name: \n')
+            price = float(input('Item price: \n'))
+            quantity = int(input('Item quantity: \n'))
+            description = input('Item description: \n')
+
+            item = ItemToPurchase(name, price, quantity, description)  # Creates ItemToPurchase with input info
             ShoppingCart.add_item(item)
         if selection == 'r':
             item = input('Item name: \n')
@@ -95,6 +101,20 @@ def print_menu(ShoppingCart):
                 else:
                     print('Item not found in cart. Nothing modified.')
         if selection == 'i':
+            print('\nOUTPUT ITEMS\' DESCRIPTIONS')
             ShoppingCart.print_descriptions()
         if selection == 'o':
+            print('\nOUTPUT SHOPPING CART')
             ShoppingCart.print_total()
+        else:
+            print('Please enter a valid menu option')
+
+####
+
+# Get customer input for name and date
+name = input('Customer name: ')
+date = input('Current date: ')
+
+ShoppingCart = ShoppingCart(name, date)
+
+print_menu(ShoppingCart)
