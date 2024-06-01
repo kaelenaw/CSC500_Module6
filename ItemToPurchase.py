@@ -4,7 +4,7 @@ class ItemToPurchase:
         self.item_price = item_price
         self.item_quantity = item_quantity
         self.item_description = item_description
-        self.item_total = float(f'{(self.item_price * self.item_quantity):2f}')
+        self.item_total = self.item_price * self.item_quantity
     def print_item_cost(self):
         print(f"{self.item_name} {self.item_quantity} @ ${self.item_price:.2f} = ${self.item_total:.2f}")
 
@@ -19,9 +19,7 @@ class ShoppingCart:
 
     def remove_item(self, item_name):
         removed = False
-        print("Trying to remove:", item_name)  # Debugging statement
         for item in self.cart_items[:]:  # Iterate over a copy of the list
-            print("Item in cart:", item.item_name)  # Debugging statement
             if item.item_name == item_name:
                 self.cart_items.remove(item)
                 print(f'{item_name} removed from cart.')
@@ -31,17 +29,27 @@ class ShoppingCart:
             print('\nItem not found in cart. Nothing removed.\n')
 
     def modify_item(self, ItemToPurchase):
+        item_found = False
         for cart_item in self.cart_items: # For every cart item in the list
-            if cart_item == ItemToPurchase.item_name: # If a cart item name is also a name in ItemToPurchase
-                if ItemToPurchase.item_price != 0.0:
+            if cart_item.item_name == ItemToPurchase.item_name: # If a cart item name is also a name in ItemToPurchase
+                item_found = True
+                if ItemToPurchase.item_price != 0.0 and ItemToPurchase.item_price != 'p':
                     cart_item.item_price = ItemToPurchase.item_price # Modifies item price
-                if ItemToPurchase.item_quantity != 0.0:
+                    cart_item.item_total = cart_item.item_price * cart_item.item_quantity # Update total of item
+
+                    print(f"{ItemToPurchase.item_name} price modified to {ItemToPurchase.item_price}.")
+                if ItemToPurchase.item_quantity != 0.0 and ItemToPurchase.item_quantity != 'q':
                     cart_item.item_quantity = ItemToPurchase.item_quantity # Modifies item quantity
-                if ItemToPurchase.item_description != '':
+                    cart_item.item_total = cart_item.item_price * cart_item.item_quantity # Update total of item
+
+                    print(f"{ItemToPurchase.item_name} quantity modified to {ItemToPurchase.item_quantity}.")
+                if ItemToPurchase.item_description != '' and ItemToPurchase.item_description != 'd':
                     cart_item.item_description = ItemToPurchase.item_description # Modifies item description
+
+                    print(f"{ItemToPurchase.item_name} description modified to {ItemToPurchase.item_description}.")
                 break
-            else:
-                print('Item not found in cart. Nothing modified.')
+        if not item_found:
+            print('Item not found in cart. Nothing modified.')
     def get_num_items_in_cart(self):
         return len(self.cart_items)
     def get_cost_of_cart(self):
@@ -77,36 +85,32 @@ def print_menu(ShoppingCart):
         print('i - Output items\' descriptions')
         print('o - Output shopping cart')
         print('q - Quit')
-        selection = input('\nChoose an option: \n')
+        selection = input('\nChoose an option: ')
         if selection == 'a':
             # Get input for item information from user
-            name = input('Item name: \n')
+            name = input('\nItem name: \n')
             price = float(input('Item price: \n'))
             quantity = int(input('Item quantity: \n'))
             description = input('Item description: \n')
 
             item = ItemToPurchase(name, price, quantity, description)  # Creates ItemToPurchase with input info
             ShoppingCart.add_item(item)
-        if selection == 'r':
+        elif selection == 'r':
             item = input('Item name: \n')
             ShoppingCart.remove_item(item)
-        if selection == 'c':
-            item = input('Item name: \n')
-            for cart_item in self.cart_items:  # For every cart item in the list
-                if cart_item == item.item_name:  # If a cart item name is also a name in ItemToPurchase
-                    if item.item_quantity != 0.0:
-                        new_quantity = int(input('Enter new quantity: '))
-                        cart_item.item_quantity = new_quantity  # Modifies item quantity
-                    break
-                else:
-                    print('Item not found in cart. Nothing modified.')
-        if selection == 'i':
+        elif selection == 'c':
+            name = input('Item name: \n')
+            new_quantity = int(input('Enter new quantity: '))
+
+            item = ItemToPurchase(name, 'p', new_quantity, 'd')
+            ShoppingCart.modify_item(item)
+        elif selection == 'i':
             print('\nOUTPUT ITEMS\' DESCRIPTIONS')
             ShoppingCart.print_descriptions()
-        if selection == 'o':
+        elif selection == 'o':
             print('\nOUTPUT SHOPPING CART')
             ShoppingCart.print_total()
-        else:
+        elif selection != 'q':
             print('Please enter a valid menu option')
 
 ####
